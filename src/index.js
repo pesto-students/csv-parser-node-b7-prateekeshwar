@@ -37,11 +37,6 @@ escape: args.escape || '"'
 }
 
 const result = csvFileToJsonSync(sourceFilePath, options)
-// const ter= [].toString
-console.log("dddddd")
-result.setEncoding('utf8')
-// console.log(result)
-console.log('result--JSON');
 result.on('data', (chunk) => {
   console.log(chunk);
 });
