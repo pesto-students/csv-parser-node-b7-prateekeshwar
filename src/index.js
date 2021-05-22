@@ -19,6 +19,7 @@ if (args.help || (!args.file)) {
   --header         Explicitly specify csv headers as a comma separated list(default=false)
   --help           Show this help
   --delimeter      Set the separator character ("," by default)
+  --skipError      Set skip error boolean(false by default)
 `)
   process.exit(0)
 }
@@ -33,7 +34,8 @@ const sourceFilePath = path.resolve(args.file)
 const options = {
 header : args.header,
 delimeter : args.delimeter || ',',
-escape: args.escape || '"'
+escape: args.escape || '"',
+skipError: args.skipError,
 }
 
 const result = csvFileToJsonSync(sourceFilePath, options)

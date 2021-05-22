@@ -1,11 +1,11 @@
 const fs = require("fs");
 const { Transform } = require("stream");
 
-function csvToJson(array, headers, delimeter, escapeChar) {
-  try {
-    let result = [];
-    array = array.filter(Boolean);
-    array.forEach((element) => {
+function csvToJson(array, headers, delimeter, escapeChar, skipError) {
+  let result = [];
+  array = array.filter(Boolean);
+  array.forEach((element) => {
+    try {
       if (element[0] !== "#") {
         const rowValue = splitString(delimeter, element, escapeChar);
         const rowObj = {};
@@ -18,12 +18,16 @@ function csvToJson(array, headers, delimeter, escapeChar) {
         }
         result.push(rowObj);
       }
-    });
+    } catch (error) {
+      if (skipError) {
+        console.warn(`Failed to parse ${chunkNumber}. skipping it`);
+      } else {
+        throw new Error(`Failed to parse csv \n ERROR: ${error}`);
+      }
+    }
+  });
 
-    return result;
-  } catch (error) {
-      console.error(`Failed to parse ${error}`)
-  }
+  return result;
 }
 
 function splitString(splitChar, str, escapeChar) {
@@ -44,7 +48,7 @@ function splitString(splitChar, str, escapeChar) {
     }
     return splitedArr;
   } catch (error) {
-    console.error(`Failed to parse ${error}`)
+    console.error(`Failed to parse ${error}`);
   }
 }
 
@@ -57,7 +61,7 @@ function skipCommentedLineHeader(arr, index) {
     }
     return arr;
   } catch (error) {
-    console.error(`Failed to parse ${error}`)
+    console.error(`Failed to parse ${error}`);
   }
 }
 
@@ -82,7 +86,8 @@ function csvFileToJsonSync(sourceFilePath, options) {
         array,
         headers,
         options.delimeter,
-        options.escape
+        options.escape,
+        options.skipError
       );
       transformStream.push(JSON.stringify(result));
       chunkNumber += 1;
@@ -90,7 +95,11 @@ function csvFileToJsonSync(sourceFilePath, options) {
 
     return transformStream;
   } catch (error) {
-    console.error(`Failed to parse ${error}`)
+    if (options.skipError) {
+      console.warn(`Failed to parse ${chunkNumber}. skipping it`);
+    } else {
+      throw new Error(`Failed to parse csv \n ERROR: ${error}`);
+    }
   }
 }
 
