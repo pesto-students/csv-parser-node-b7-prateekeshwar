@@ -3,16 +3,16 @@
 'use strict';
 
 const { csvFileToJsonSync } = require('./csv-parser')
+var stream = require('stream');
 const minimist = require('minimist');
 const fs = require('fs')
 const path = require('path');
 
 const args = minimist(process.argv.slice(2), {
-    boolean: ['header'],
+    boolean: ['header', 'skipError'],
     string: ['file', 'delimeter', 'escape'],
   });
 
-console.log("test args man", args)
 if (args.help || (!args.file)) {
   console.error(`Usage: csv-parser [file?] [options]
   --escape         Set the escape character (defaults to quote value)
@@ -40,5 +40,5 @@ skipError: args.skipError,
 
 const result = csvFileToJsonSync(sourceFilePath, options)
 result.on('data', (chunk) => {
-  console.log(chunk);
-});
+        console.log(chunk.toString());
+})

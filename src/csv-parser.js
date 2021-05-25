@@ -87,12 +87,11 @@ function csvFileToJsonSync(sourceFilePath, options) {
         headers,
         options.delimeter,
         options.escape,
-        options.skipError
+        options.skipError,
       );
       transformStream.push(JSON.stringify(result));
       chunkNumber += 1;
-    });
-
+    })
     return transformStream;
   } catch (error) {
     if (options.skipError) {
